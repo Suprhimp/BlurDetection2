@@ -3,6 +3,8 @@ import argparse
 import logging
 import pathlib
 import json
+import os
+import shutil
 
 import cv2
 
@@ -27,7 +29,6 @@ def parse_args():
 
 def find_images(image_paths, img_extensions=['.jpg', '.png', '.jpeg']):
     img_extensions += [i.upper() for i in img_extensions]
-
     for path in image_paths:
         path = pathlib.Path(path)
 
@@ -44,8 +45,10 @@ def find_images(image_paths, img_extensions=['.jpg', '.png', '.jpeg']):
 
 
 if __name__ == '__main__':
+    print('hi')
     assert sys.version_info >= (3, 6), sys.version_info
     args = parse_args()
+    print(args)
 
     level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(level=level)
@@ -78,6 +81,13 @@ if __name__ == '__main__':
 
         logging.info(f'image_path: {image_path} score: {score} blurry: {blurry}')
         results.append({'input_path': str(image_path), 'score': score, 'blurry': blurry})
+
+        if(score<30): shutil.move(image_path, "output/low")
+        elif(70>score>=30): shutil.move(image_path, "output/middle")
+        # elif(90>score>=70) : shutil.move(image_path,"output/middleHigh")
+        # elif(100>=score>=90) : shutil.move(image_path,"output/high")
+        else: shutil.move(image_path,"output/strange")
+
 
         if args.display:
             cv2.imshow('input', image)
